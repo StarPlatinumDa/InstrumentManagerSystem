@@ -1,0 +1,10 @@
+<RCC>
+    <qresource prefix="/pic">
+        <file>picture/background.jpg</file>
+        <file>picture/password.png</file>
+        <file>picture/username.png</file>
+        <file>picture/leixing.png</file>
+        <file>picture/userlog.png</file>
+        <file>picture/logback.jpg</file>
+    </qresource>
+</RCC>
