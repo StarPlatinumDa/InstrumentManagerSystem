@@ -16,19 +16,19 @@ GZSystem::~GZSystem()
     delete ui;
 }
 
-void GZSystem::on_pushButton_clicked()
+void GZSystem::on_pb_department_clicked()
 {
     DepartmentManager w;
     w.exec();
 }
 
-void GZSystem::on_pushButton_2_clicked()
+void GZSystem::on_pb_user_clicked()
 {
     UserManager w;
     w.exec();
 }
 
-void GZSystem::on_pushButton_3_clicked()
+void GZSystem::on_pb_instrument_clicked()
 {
     InstrumentManager w;
     w.exec();

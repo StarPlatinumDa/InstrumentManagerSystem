@@ -12,6 +12,7 @@ DepartmentManager::DepartmentManager(QWidget *parent) :
     QFile file1("baseinformation/user.txt");
     file1.open(QIODevice::ReadOnly|QIODevice::Text);
     QTextStream stream1(&file1);
+    //stream1.setCodec("utf-8");
     fuzeren=new QStringList;
     while(!stream1.atEnd())
     {
@@ -21,13 +22,13 @@ DepartmentManager::DepartmentManager(QWidget *parent) :
     QFile file("baseinformation/department.txt");
     file.open(QIODevice::ReadOnly|QIODevice::Text);
     QTextStream stream(&file);
+    //stream.setCodec("utf-8");
     str=new QStringList;
     while(!stream.atEnd())
     {
         str->append(stream.readLine());
 
     }
-    qDebug()<<str->length();
     this->ui->cb_master->setCurrentIndex(-1);
     this->ui->cb_department->setCurrentIndex(-1);
     model=new QStandardItemModel;
@@ -91,7 +92,7 @@ void DepartmentManager::searchdepart(QString d)
         for(int i=0;i<str->length();i++){
             if(d==str->at(i).split(" ").at(1)){
                 p->append(str->at(i));
-                ui->cb_master->setCurrentText(p->at(0).split(" ").at(2));
+                ui->cb_master->setCurrentText(searchfuzerenB(p->at(0).split(" ").at(2)));
                 show(p);
             }
         }
@@ -105,6 +106,7 @@ void DepartmentManager::searchfuzeren(QString d)
         ui->cb_department->setCurrentText("全部");
         show(str);
     }
+    else{
         QStringList *p=new QStringList;
         for(int i=0;i<str->length();i++){
             if(d==searchfuzerenB(str->at(i).split(" ").at(2))){
@@ -115,7 +117,7 @@ void DepartmentManager::searchfuzeren(QString d)
         }
        delete p;
     }
-
+}
 
 QString DepartmentManager::searchfuzerenB(QString f)
 {
@@ -160,6 +162,7 @@ void DepartmentManager::dealnextadd()
         this->ui->cb_master->addItem(searchfuzerenB(str->at(i).split(" ").at(2)));
     }
     show(str);
+    ui->pb_modify->setEnabled(0);
 }
 
 void DepartmentManager::on_tableView_clicked(const QModelIndex &index)

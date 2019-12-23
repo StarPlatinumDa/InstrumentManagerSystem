@@ -16,11 +16,12 @@ public:
     ~GZSystem();
 
 private slots:
-    void on_pushButton_clicked();
 
-    void on_pushButton_2_clicked();
+    void on_pb_department_clicked();
 
-    void on_pushButton_3_clicked();
+    void on_pb_user_clicked();
+
+    void on_pb_instrument_clicked();
 
 private:
     Ui::GZSystem *ui;
