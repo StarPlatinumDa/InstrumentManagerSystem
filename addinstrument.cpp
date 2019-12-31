@@ -7,7 +7,6 @@
 #include <QMessageBox>
 #include <QDateTime>
 #include <global.h>
-#include <QtDebug>
 #include "hander.h"
 AddInstrument::AddInstrument(QWidget *parent) :
     QDialog(parent),

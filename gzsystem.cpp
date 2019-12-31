@@ -18,18 +18,24 @@ GZSystem::~GZSystem()
 
 void GZSystem::on_pb_department_clicked()
 {
+    this->hide();
     DepartmentManager w;
     w.exec();
+    this->show();
 }
 
 void GZSystem::on_pb_user_clicked()
 {
+    this->hide();
     UserManager w;
     w.exec();
+    this->show();
 }
 
 void GZSystem::on_pb_instrument_clicked()
 {
+    this->hide();
     InstrumentManager w;
     w.exec();
+    this->show();
 }

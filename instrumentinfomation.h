@@ -22,6 +22,7 @@ public:
 
     void setInstrumentId(const QString &value);
 
+
 private:
     Ui::InstrumentInfomation *ui;
     QString instrumentId;

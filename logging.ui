@@ -104,9 +104,9 @@
            </widget>
           </item>
           <item>
-           <widget class="QLineEdit" name="le_username">
-            <property name="placeholderText">
-             <string>username</string>
+           <widget class="QComboBox" name="cb_username">
+            <property name="editable">
+             <bool>true</bool>
             </property>
            </widget>
           </item>
@@ -154,7 +154,7 @@
           <item>
            <widget class="QComboBox" name="comboBox">
             <property name="currentIndex">
-             <number>0</number>
+             <number>3</number>
             </property>
             <property name="maxCount">
              <number>2147483646</number>

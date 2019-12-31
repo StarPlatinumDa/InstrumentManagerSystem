@@ -18,40 +18,48 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
     addinstrument.cpp \
     departmentmanager.cpp \
+    detail.cpp \
     global.cpp \
     gzsystem.cpp \
     hander.cpp \
+    individual.cpp \
     instrumentinfomation.cpp \
     instrumentmanager.cpp \
-    instruments.cpp \
     logging.cpp \
     main.cpp \
     modify.cpp \
     userinformation.cpp \
     usermanager.cpp
 
+
 HEADERS += \
     addinstrument.h \
     departmentmanager.h \
+    detail.h \
     global.h \
     gzsystem.h \
     hander.h \
+    individual.h \
     instrumentinfomation.h \
     instrumentmanager.h \
-    instruments.h \
     logging.h \
     modify.h \
     userinformation.h \
     usermanager.h \
-    progressarc.h
+    progresswater.h \
+    progresspercent.h \
+    navprogress.h \
+    navbar.h \
+    lunarcalendaritem.h
 
 FORMS += \
     addinstrument.ui \
     departmentmanager.ui \
+    detail.ui \
     gzsystem.ui \
+    individual.ui \
     instrumentinfomation.ui \
     instrumentmanager.ui \
-    instruments.ui \
     logging.ui \
     modify.ui \
     userinformation.ui \

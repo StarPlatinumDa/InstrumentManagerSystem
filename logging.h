@@ -20,8 +20,6 @@ private slots:
 
     void on_pb_ok_clicked();
 
-    void on_le_username_returnPressed();
-
     void on_le_password_returnPressed();
 
 private:
@@ -30,7 +28,9 @@ private:
     QString password;
     QString encode(QString &s);
     QStringList *users;
+    QStringList *history;
     bool readFile(QString path,QStringList *container);
+
 };
 
 #endif // LOGGING_H

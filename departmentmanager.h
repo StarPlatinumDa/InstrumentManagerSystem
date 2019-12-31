@@ -35,8 +35,6 @@ private slots:
 
     void on_pb_add_clicked();
 
-    void on_tableView_doubleClicked(const QModelIndex);
-
     void dealnextadd();//添加的槽函数
 
     void on_tableView_clicked(const QModelIndex &index);

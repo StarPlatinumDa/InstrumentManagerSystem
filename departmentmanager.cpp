@@ -142,11 +142,6 @@ void DepartmentManager::on_pb_add_clicked()
     m.exec();
 }
 
-void DepartmentManager::on_tableView_doubleClicked(const QModelIndex)
-{
-     searchdepart(this->ui->cb_department->currentText());
-}
-
 void DepartmentManager::dealnextadd()
 {
     str=m.str;

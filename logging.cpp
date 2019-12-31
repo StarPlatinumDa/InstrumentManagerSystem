@@ -12,16 +12,19 @@ Logging::Logging(QWidget *parent) :
 {
     ui->setupUi(this);
     this->setWindowFlags(windowFlags()|Qt::FramelessWindowHint);
-    username="admin";
-    password="123456";
     users=new QStringList;
+    history=new QStringList;
     if(!readFile("baseinformation/user.txt",users)){
-        QMessageBox::critical(this,"错误","系统文件丢失");
+        QMessageBox::critical(this,"错误","系统文件丢失\n只允许admin用户登录");
     }
+    readFile("loginghistory/history.txt",history);
+    this->ui->cb_username->addItems(*history);
 }
 
 Logging::~Logging()
 {
+    delete history;
+    delete users;
     delete ui;
 }
 
@@ -58,15 +61,24 @@ void Logging::on_pb_ok_clicked()
 {
     Global *temp=Global::getInstant();
     if(this->ui->comboBox->currentText()=="管理员"){
-        if(this->ui->le_username->text()==username&&this->ui->le_password->text()==password){
+        username="admin";
+        password="123456";
+        if(this->ui->cb_username->currentText()==username&&this->ui->le_password->text()==password){
             temp->setUsertype(this->ui->comboBox->currentIndex());
+            if(!history->contains(this->ui->cb_username->currentText())){
+                QFile file("loginghistory/history.txt");
+                file.open(QIODevice::Append | QIODevice::Text);
+                QTextStream out(&file);
+                out<<this->ui->cb_username->currentText()+"\n";
+                file.close();
+            }
            this->accept();
         }
         else{
             QMessageBox::critical(this,"错误","密码或用户名错误！");
         }
     }else{
-        username=this->ui->le_username->text();
+        username=this->ui->cb_username->currentText();
         password=this->ui->le_password->text();
         password=encode(password);
         for(int i=0;i<users->length();i++){
@@ -74,6 +86,13 @@ void Logging::on_pb_ok_clicked()
                 if(password==users->at(i).split(" ").at(4)&&this->ui->comboBox->currentIndex()>=users->at(i).split(" ").at(3).toInt()){
                     temp->setUsertype(this->ui->comboBox->currentIndex());
                     temp->setUserid(username);
+                    if(!history->contains(this->ui->cb_username->currentText())){
+                        QFile file("loginghistory/history.txt");
+                        file.open(QIODevice::Append | QIODevice::Text);
+                        QTextStream out(&file);
+                        out<<this->ui->cb_username->currentText()+"\n";
+                        file.close();
+                    }
                     this->accept();
                     return;
                 }
@@ -82,12 +101,6 @@ void Logging::on_pb_ok_clicked()
         }
         QMessageBox::critical(this,"错误","密码或用户名错误！");
     }
-}
-
-void Logging::on_le_username_returnPressed()
-{
-    if(this->ui->le_username->text()!="")
-        this->ui->le_password->setFocus();
 }
 
 void Logging::on_le_password_returnPressed()

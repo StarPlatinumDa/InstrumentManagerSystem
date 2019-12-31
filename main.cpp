@@ -1,8 +1,8 @@
 #include "gzsystem.h"
 #include <QApplication>
 #include "logging.h"
-#include "instrumentinfomation.h"
 #include "global.h"
+#include "individual.h"
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
@@ -20,13 +20,12 @@ int main(int argc, char *argv[])
             G.show();
             return a.exec();
         }else if(temp->getUsertype()==2){
-            GZSystem G;
+
+        }else{
+            Individual G;
             G.show();
             return a.exec();
-        }else{
-
         }
-
     }
     return 0;
 }

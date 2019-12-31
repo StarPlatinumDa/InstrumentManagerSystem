@@ -4,7 +4,6 @@
 #include <QTextStream>
 #include <QMessageBox>
 #include <QDateTime>
-#include <QtDebug>
 using namespace QtCharts;
 InstrumentInfomation::InstrumentInfomation(QWidget *parent) :
     QDialog(parent),
@@ -14,9 +13,10 @@ InstrumentInfomation::InstrumentInfomation(QWidget *parent) :
     model=new QStandardItemModel;
     usinglog=new QStringList;
     setheader(6,"时间 事件 部门 经办人 审核人 残值",model);
-    this->ui->widget->setStartAngle(0);
-    this->ui->widget->setEndAngle(0);
-    this->ui->widget->setTitle("残值");
+    this->ui->widget->setRange(0,100);
+    this->ui->widget->setReverse(true);
+    this->ui->widget->setWaterDensity(6);
+    this->ui->widget->setWaterHeight(5);
     this->ui->tableView->setModel(model);
 }
 
@@ -91,7 +91,7 @@ void InstrumentInfomation::setInformation(QString s)
     this->ui->lab_price->setText(temp.at(4));
     this->ui->lab_time->setText(temp.at(5)+" "+temp.at(6));
 }
-//通过时间计算权值
+//通过时间计算残值
 int InstrumentInfomation::getCanZhi(QString end)
 {
     QString temp=this->ui->lab_time->text().split(" ").at(0);
@@ -124,7 +124,7 @@ void InstrumentInfomation::createChart(QList<QDateTime> *data)
     axisY->setRange(0,100);
     axisY->setTickCount(10);
     for(auto&i:*data){
-        series->append(i.toMSecsSinceEpoch(),getCanZhi(i.toString("yyyy-MM")));
+        series->append(i.toMSecsSinceEpoch(),getCanZhi(i.toString("yyyy-MM-dd")));
     }
     series->setName("残值曲线");
     chart->addSeries(series);
@@ -217,3 +217,4 @@ QStringList InstrumentInfomation::exchange()
     }
     return temp;
 }
+

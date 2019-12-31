@@ -37,6 +37,24 @@ private slots:
 
     void on_tableView_3_doubleClicked(const QModelIndex &index);
 
+    void on_tableView_1_doubleClicked(const QModelIndex &index);
+
+    void on_tableView_2_doubleClicked(const QModelIndex &index);
+
+    void on_pb_search_4_clicked();
+
+    void on_le_instrument_name_2_textChanged(const QString &);
+
+    void on_cb_shenheren_currentIndexChanged(int);
+
+    void on_tableView_4_doubleClicked(const QModelIndex &index);
+
+    void on_tableView_5_doubleClicked(const QModelIndex &index);
+
+    void on_pushButton_2_clicked();
+
+    void on_tableView_5_clicked(const QModelIndex &index);
+
 private:
     Ui::InstrumentManager *ui;
     QStringList *useing;
@@ -48,16 +66,24 @@ private:
     QStandardItemModel *modelforcangku;
     QStandardItemModel *modelforuser;
     QStandardItemModel *modelforused;
+    QStandardItemModel *modelforbaofei;
+    QString baofeiid;
     bool readFile(QString path,QStringList *container);
     void setheader(int column,QString head,QStandardItemModel *model);
+    bool writeFile(QString path,QStringList *container);
     void settable(int column,QStandardItemModel *model,QStringList *data);
     QString getDepartmentName(QString id);
     QString getUserName(QString id);
     QString getUserDepartmentId(QString id);
+    QString departmentNameToId(QString name);
     int instrumentNumber(QStringList * list,QString NMP);
     QStringList findForUnused();
     QStringList findForDepartment();
     QStringList findForUser(QString name);
+    QStringList findForUsed(QString name);
+    int getCanZhi(QString start);
+    QStringList findForBaofei();
+    void refreshBaofei();
 };
 
 #endif // INSTRUMENTMANAGER_H

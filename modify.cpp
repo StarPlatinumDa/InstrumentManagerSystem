@@ -4,7 +4,6 @@
 #include<QTextStream>
 #include<QTextCodec>
 #include<QMessageBox>
-#include<QDebug>
 Modify::Modify(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::Modify)
@@ -88,8 +87,9 @@ void Modify::on_pb_ok_clicked()
             QFile f("baseinformation\\department.txt");
             f.open(QIODevice::Append);
             QString write=ui->le_number->text()+" "+ui->le_name->text()+" "+searchdepart(ui->cb_fuzeren->currentText())+" "+ui->te_description->toPlainText()+"\n";
-            QString write1=ui->le_number->text()+" "+ui->le_name->text()+" "+searchdepart(ui->cb_fuzeren->currentText())+" "+ui->te_description->toPlainText();
-            str->append(write1);
+            str->append(write);
+            QTextStream out(&f);
+            out<<write;
             f.close();
             this->close();
         }
@@ -117,7 +117,6 @@ void Modify::on_pb_ok_clicked()
             f1.open(QIODevice::WriteOnly|QIODevice::Text);
             QTextStream out(&f1);
             out<<a;
-            qDebug()<<a;
             f1.close();
             this->close();
             }
