@@ -58,11 +58,13 @@ private:
     bool readFile(QString path,QStringList *container);
     bool readFileForUser();
     bool writeFile(QString path,QString data);
+    bool writeFile1(QString path,QStringList* data);
     bool readFileForInstrument();
     void setheader(int column,QString head,QStandardItemModel *model);
     void settable(int column,QStandardItemModel *model,QStringList *data);
     void selectMessage();
     QString getDepartmentName(QString id);
+    QString getUserDepartmentId(QString id);
     QStringList *getMessageData();
     QString state(QString message);
     QString getInstrumentinformation(QString path,QString id);

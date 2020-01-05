@@ -9,7 +9,6 @@
 #include <QTimer>
 #include <detail.h>
 #include <global.h>
-#include <QDebug>
 InstrumentManager::InstrumentManager(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::InstrumentManager)
@@ -51,6 +50,29 @@ InstrumentManager::InstrumentManager(QWidget *parent) :
     this->ui->pb_search_1->click();
     Hander *temp=Hander::getInstant();
     connect(temp,SIGNAL(addInstrument(QString)),this,SLOT(addnew(QString)));
+    allequip=new QStringList;
+    readFile("baseinformation/instrument-using.txt",allequip);
+    readFile("baseinformation/instrument-unused.txt",allequip);
+    allaplly=new QStringList;
+    readFile("message/message.txt",allaplly);
+    modelforapply=new QStandardItemModel;
+    ui->tableView_6->setModel(modelforapply);
+    useableapply=new QStringList;
+    for(int i=0;i<allaplly->length();i++)//分理出部门通过的申请
+    {
+        if(allaplly->at(i).split(" ").at(0)=="A"||allaplly->at(i).split(" ").at(0)=="D"){
+            if(allaplly->at(i).split(" ").at(3)=="1")useableapply->append(allaplly->at(i));
+        }
+        if(allaplly->at(i).split(" ").at(0)=="C")useableapply->append(allaplly->at(i));
+    }
+    departname=new QStringList;
+    for(int i=0;i<useableapply->length();i++){
+        if(!departname->contains(getDepartmentName(getUserDepartmentId(useableapply->at(i).split(" ").at(1)))))departname->append(getDepartmentName(getUserDepartmentId(useableapply->at(i).split(" ").at(1))));
+    }
+    for(int i=0;i<departname->length();i++){
+        ui->cb_department->addItem(departname->at(i));
+    }
+    showapply(useableapply);
 }
 
 InstrumentManager::~InstrumentManager()
@@ -301,6 +323,80 @@ void InstrumentManager::refreshBaofei()
     QStringList temp=findForBaofei();
     settable(5,modelforbaofei,&temp);
 }
+
+void InstrumentManager::headapply()
+{
+    modelforapply->setHorizontalHeaderItem(0,new QStandardItem("申请类型"));
+    modelforapply->setHorizontalHeaderItem(1,new QStandardItem("申请部门"));
+    modelforapply->setHorizontalHeaderItem(2,new QStandardItem("申请人"));
+    modelforapply->setHorizontalHeaderItem(3,new QStandardItem("仪器名称"));
+    modelforapply->setHorizontalHeaderItem(4,new QStandardItem("审核情况"));
+    ui->tableView_6->setColumnWidth(0,150);
+    ui->tableView_6->setColumnWidth(1,150);
+    ui->tableView_6->setColumnWidth(2,150);
+    ui->tableView_6->setColumnWidth(3,150);
+    ui->tableView_6->setColumnWidth(4,132);
+}
+
+void InstrumentManager::showapply(QStringList *str)
+{
+    for(int i=0;i<str->length();i++)
+    {
+        modelforapply->clear();
+        for(int i=0;i<str->length();i++){
+            QString temp;
+            if(str->at(i).split(" ").at(0)=="A")temp="设备申请";
+            else if(str->at(i).split(" ").at(0)=="D")temp="设备归还";
+            else temp="跨部门移交";
+            modelforapply->setItem(i,0,new QStandardItem(temp));
+            modelforapply->setItem(i,1,new QStandardItem(getDepartmentName(getUserDepartmentId(str->at(i).split(" ").at(1)))));
+            modelforapply->setItem(i,2,new QStandardItem(getUserName(str->at(i).split(" ").at(1))));
+            modelforapply->setItem(i,3,new QStandardItem(findequipnamebyid(str->at(i).split(" ").at(2),allequip)));
+//            if(str->at(i).split(" ").at(0)=="A")modelforapply->setItem(i,3,new QStandardItem(findequipnamebyid(str->at(i).split(" ").at(2),unused)));
+//            else modelforapply->setItem(i,3,new QStandardItem(findequipnamebyid(str->at(i).split(" ").at(2),useing)));
+            if(str->at(i).split(" ").at(0)=="C"){
+                modelforapply->setItem(i,4,new QStandardItem(shenhe(str->at(i).split(" ").at(3).toInt())));
+            }else {
+                modelforapply->setItem(i,4,new QStandardItem(shenhe(str->at(i).split(" ").at(4).toInt())));
+            }
+            modelforapply->item(i,0)->setTextAlignment(Qt::AlignCenter);
+            modelforapply->item(i,1)->setTextAlignment(Qt::AlignCenter);
+            modelforapply->item(i,2)->setTextAlignment(Qt::AlignCenter);
+            modelforapply->item(i,3)->setTextAlignment(Qt::AlignCenter);
+            modelforapply->item(i,4)->setTextAlignment(Qt::AlignCenter);
+        }
+        headapply();
+    }
+}
+
+QString InstrumentManager::findequipnamebyid(QString id,QStringList *str)
+{
+    for(int i=0;i<str->length();i++){
+        if(str->at(i).split(" ").at(0)==id)return str->at(i).split(" ").at(1);
+    }
+    return  "";
+}
+
+QString InstrumentManager::shenhe(int i)
+{
+    if(i==0)return "未通过";
+    else if(i==1)return "通过";
+    else return "未审核";
+}
+
+void InstrumentManager::writefile(QString filename, QStringList *str)
+{
+    QString a="";
+    for(int i=0;i<str->length();i++)
+    {
+        a=a+str->at(i)+"\n";
+    }
+    QFile f1(filename);
+    f1.open(QIODevice::WriteOnly|QIODevice::Text);
+    QTextStream st(&f1);
+    st<<a;
+    f1.close();
+}
 void InstrumentManager::on_pb_search_1_clicked()
 {
     modelforcangku->clear();
@@ -519,4 +615,264 @@ void InstrumentManager::on_tableView_5_clicked(const QModelIndex &index)
 {
     baofeiid=modelforbaofei->item(index.row(),2)->text();
     ui->pushButton_2->setEnabled(true);
+}
+void InstrumentManager::on_cb_department_currentTextChanged(const QString &arg1)
+{
+    if(arg1=="全部")showapply(useableapply);
+    else{
+        QStringList *str=new QStringList;
+        for(int i=0;i<useableapply->length();i++){
+            if(getDepartmentName(getUserDepartmentId(useableapply->at(i).split(" ").at(1)))==arg1){
+                str->append(useableapply->at(i));
+            }
+        }
+        showapply(str);
+    }
+}
+
+void InstrumentManager::on_tableView_6_clicked(const QModelIndex &index)
+{
+    ui->pb_agree->setEnabled(true);
+    ui->pb_reject->setEnabled(true);
+    if(modelforapply->item(index.row(),0)->text() =="跨部门移交"){
+        for(int i=0;i<useableapply->length();i++){
+            if(findequipnamebyid(useableapply->at(i).split(" ").at(2),useing)==modelforapply->item(index.row(),3)->text()&&getUserName(useableapply->at(i).split(" ").at(1))==modelforapply->item(index.row(),2)->text()){
+                currrentapplyrow=i;
+                break;
+            }
+        }
+    }
+    else if(modelforapply->item(index.row(),0)->text() =="设备申请"){
+        for(int i=0;i<useableapply->length();i++){
+            if(findequipnamebyid(useableapply->at(i).split(" ").at(2),unused)==modelforapply->item(index.row(),3)->text()&&getUserName(useableapply->at(i).split(" ").at(1))==modelforapply->item(index.row(),2)->text())
+            {
+                    currrentapplyrow=i;
+                    break;
+            }
+        }
+    }
+    else{
+        for(int i=0;i<useableapply->length();i++){
+            if(findequipnamebyid(useableapply->at(i).split(" ").at(2),useing)==modelforapply->item(index.row(),3)->text()&&getUserName(useableapply->at(i).split(" ").at(1))==modelforapply->item(index.row(),2)->text()){
+                currrentapplyrow=i;
+                break;
+            }
+        }
+    }
+}
+
+void InstrumentManager::on_pb_agree_clicked()
+{
+    Global *glo=Global::getInstant();//获取当前登陆者的信息
+    QMessageBox *b=new QMessageBox("再次确认",		///--这里是设置消息框标题
+                                   "您真的要执行该操作吗？",						///--这里是设置消息框显示的内容
+                                   QMessageBox::Question,							///--这里是在消息框显示的图标
+                                   QMessageBox::Ok | QMessageBox::Default,		///---这里是显示消息框上的按钮情况
+                                   QMessageBox::Cancel | QMessageBox::Escape,	///---这里与 键盘上的 escape 键结合。当用户按下该键，消息框将执行cancel按钮事件
+                                   0);
+    int a=b->exec();
+    if(a==QMessageBox::Ok){
+        if(useableapply->at(currrentapplyrow).split(" ").at(0)=="C"){
+            for(int i=0;i<allaplly->length();i++){
+                if(allaplly->at(i)==useableapply->at(currrentapplyrow)){
+                    QString temp="C "+useableapply->at(currrentapplyrow).split(" ").at(1)+" "+useableapply->at(currrentapplyrow).split(" ").at(2)+" 1 "+useableapply->at(currrentapplyrow).split(" ").at(4)+" 1 "+useableapply->at(currrentapplyrow).split(" ").at(6)+" 1 "+glo->getUserid();
+                    allaplly->replace(i,temp);
+                    useableapply->replace(currrentapplyrow,temp);
+                    QString a="";
+                    for(int i=0;i<allaplly->length();i++){
+                        a=a+allaplly->at(i)+"\n";
+                    }
+                    QFile f1("message/message.txt");
+                    f1.open(QIODevice::WriteOnly|QIODevice::Text);
+                    QTextStream st(&f1);
+                    st<<a;
+                    f1.close();
+                    break;
+                }
+            }
+            //写入记录
+            QString fname="usinglog/"+useableapply->at(currrentapplyrow).split(" ").at(2)+".txt";
+            QFile f1(fname);
+            QString a=QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm");
+            a=a+" 移交 "+getUserDepartmentId(useableapply->at(currrentapplyrow).split(" ").at(6))+" "+useableapply->at(currrentapplyrow).split(" ").at(6)+" "+glo->getUserid()+"\n";
+            f1.open(QIODevice::Append|QIODevice::Text);
+            QTextStream st(&f1);
+            st<<a;
+            f1.close();
+        }
+        else if(useableapply->at(currrentapplyrow).split(" ").at(0)=="A"){
+            for(int i=0;i<allaplly->length();i++){
+                if(allaplly->at(i)==useableapply->at(currrentapplyrow)){
+                    QString temp="A "+useableapply->at(currrentapplyrow).split(" ").at(1)+" "+useableapply->at(currrentapplyrow).split(" ").at(2)+" 1 1";
+                    allaplly->replace(i,temp);
+                    useableapply->replace(currrentapplyrow,temp);
+                    QString a="";
+                    for(int i=0;i<allaplly->length();i++){
+                        a=a+allaplly->at(i)+"\n";
+                    }
+                    QFile f1("message/message.txt");
+                    f1.open(QIODevice::WriteOnly|QIODevice::Text);
+                    QTextStream st(&f1);
+                    st<<a;
+                    f1.close();
+                    break;
+                }
+            }
+            //写入记录
+            QString fname="usinglog/"+useableapply->at(currrentapplyrow).split(" ").at(2)+".txt";
+            QFile f1(fname);
+            QString a=QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm");
+            a=a+" 借出 "+getUserDepartmentId(useableapply->at(currrentapplyrow).split(" ").at(1))+" "+useableapply->at(currrentapplyrow).split(" ").at(1)+" "+glo->getUserid()+"\n";
+            f1.open(QIODevice::Append|QIODevice::Text);
+            QTextStream st(&f1);
+            st<<a;
+            f1.close();
+            //将设备从unused移动到using
+            QString change;
+            for(int i=0;i<unused->length();i++){
+                if(unused->at(i).contains(useableapply->at(currrentapplyrow).split(" ").at(2)))
+                {
+                    change=unused->at(i);
+                    unused->removeAt(i);
+                    break;
+                }
+            }
+            change+=" "+useableapply->at(currrentapplyrow).split(" ").at(1);
+            writefile("baseinformation/instrument-unused.txt",unused);//从unused中移出
+            //追加在using中
+            useing->append(change);
+            writefile("baseinformation/instrument-using.txt",useing);
+
+        }
+        else{
+            for(int i=0;i<allaplly->length();i++){
+                if(allaplly->at(i)==useableapply->at(currrentapplyrow)){
+                    QString temp="D "+useableapply->at(currrentapplyrow).split(" ").at(1)+" "+useableapply->at(currrentapplyrow).split(" ").at(2)+" 1 1";
+                    allaplly->replace(i,temp);
+                    useableapply->replace(currrentapplyrow,temp);
+                    QString a="";
+                    for(int i=0;i<allaplly->length();i++){
+                        a=a+allaplly->at(i)+"\n";
+                    }
+                    QFile f1("message/message.txt");
+                    f1.open(QIODevice::WriteOnly|QIODevice::Text);
+                    QTextStream st(&f1);
+                    st<<a;
+                    f1.close();
+                    break;
+                }
+            }
+            //写入记录
+            QString fname="usinglog/"+useableapply->at(currrentapplyrow).split(" ").at(2)+".txt";
+            QFile f1(fname);
+            QString a=QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm");
+            a=a+" 归还 "+getUserDepartmentId(useableapply->at(currrentapplyrow).split(" ").at(1))+" "+useableapply->at(currrentapplyrow).split(" ").at(1)+" "+glo->getUserid()+"\n";
+            f1.open(QIODevice::Append|QIODevice::Text);
+            QTextStream st(&f1);
+            st<<a;
+            f1.close();
+            //从using转移到unused
+            QString change;
+            for(int i=0;i<useing->length();i++){
+                if(useing->at(i).contains(useableapply->at(currrentapplyrow).split(" ").at(2)))
+                {
+                    change=useing->at(i);
+                    useing->removeAt(i);
+                    break;
+                }
+            }
+            writefile("baseinformation/instrument-using.txt",useing);//从useing中移出
+            QString changfi="";
+            for(int i=0;i<=5;i++){
+                changfi+=change.split(" ").at(i)+" ";
+            }
+            changfi+=change.split(" ").at(6);
+            //追加在unused中
+            unused->append(changfi);
+            writefile("baseinformation/instrument-unused.txt",unused);
+
+        }
+        showapply(useableapply);
+        ui->cb_department->setCurrentIndex(0);
+    }
+    ui->pb_agree->setEnabled(false);
+    ui->pb_reject->setEnabled(false);
+}
+
+void InstrumentManager::on_pb_reject_clicked()
+{
+    QMessageBox *b=new QMessageBox("再次确认",		///--这里是设置消息框标题
+                                   "您真的要执行该操作吗？",						///--这里是设置消息框显示的内容
+                                   QMessageBox::Question,							///--这里是在消息框显示的图标
+                                   QMessageBox::Ok | QMessageBox::Default,		///---这里是显示消息框上的按钮情况
+                                   QMessageBox::Cancel | QMessageBox::Escape,	///---这里与 键盘上的 escape 键结合。当用户按下该键，消息框将执行cancel按钮事件
+                                   0);
+    int a=b->exec();
+    if(a==QMessageBox::Ok){
+        if(useableapply->at(currrentapplyrow).split(" ").at(0)=="C"){
+            for(int i=0;i<allaplly->length();i++){
+                if(allaplly->at(i)==useableapply->at(currrentapplyrow)){
+                    QString temp="C "+useableapply->at(currrentapplyrow).split(" ").at(1)+" "+useableapply->at(currrentapplyrow).split(" ").at(2)+" 0 "+useableapply->at(currrentapplyrow).split(" ").at(4)+" 1 "+useableapply->at(currrentapplyrow).split(" ").at(6)+" 1";
+                    allaplly->replace(i,temp);
+                    useableapply->replace(currrentapplyrow,temp);
+                    QString a="";
+                    for(int i=0;i<allaplly->length();i++){
+                        a=a+allaplly->at(i)+"\n";
+                    }
+                    QFile f1("message/message.txt");
+                    f1.open(QIODevice::WriteOnly|QIODevice::Text);
+                    QTextStream st(&f1);
+                    st<<a;
+                    f1.close();
+                    break;
+                }
+            }
+        }
+        else if(useableapply->at(currrentapplyrow).split(" ").at(0)=="A"){
+            for(int i=0;i<allaplly->length();i++){
+                if(allaplly->at(i)==useableapply->at(currrentapplyrow)){
+                    QString temp="A "+useableapply->at(currrentapplyrow).split(" ").at(1)+" "+useableapply->at(currrentapplyrow).split(" ").at(2)+" 1 0";
+                    allaplly->replace(i,temp);
+                    useableapply->replace(currrentapplyrow,temp);
+                    QString a="";
+                    for(int i=0;i<allaplly->length();i++){
+                        a=a+allaplly->at(i)+"\n";
+                    }
+                    QFile f1("message/message.txt");
+                    f1.open(QIODevice::WriteOnly|QIODevice::Text);
+                    QTextStream st(&f1);
+                    st<<a;
+                    f1.close();
+                    break;
+                }
+            }
+            QString fname="usinglog//"+useableapply->at(currrentapplyrow).split(" ").at(2)+".txt";
+            QFile f1(fname);
+            QString a=QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm");
+            a=a+" 借出 "+getUserDepartmentId(useableapply->at(currrentapplyrow).split(" ").at(1))+" "+useableapply->at(currrentapplyrow).split(" ").at(1)+" "+useableapply->at(currrentapplyrow).split(" ").at(1);
+        }
+        else{
+            for(int i=0;i<allaplly->length();i++){
+                if(allaplly->at(i)==useableapply->at(currrentapplyrow)){
+                    QString temp="D "+useableapply->at(currrentapplyrow).split(" ").at(1)+" "+useableapply->at(currrentapplyrow).split(" ").at(2)+" 1 0";
+                    allaplly->replace(i,temp);
+                    useableapply->replace(currrentapplyrow,temp);
+                    QString a="";
+                    for(int i=0;i<allaplly->length();i++){
+                        a=a+allaplly->at(i)+"\n";
+                    }
+                    QFile f1("message/message.txt");
+                    f1.open(QIODevice::WriteOnly|QIODevice::Text);
+                    QTextStream st(&f1);
+                    st<<a;
+                    f1.close();
+                    break;
+                }
+            }
+        }
+        showapply(useableapply);
+        ui->cb_department->setCurrentIndex(0);
+    }
+    ui->pb_agree->setEnabled(false);
+    ui->pb_reject->setEnabled(false);
 }

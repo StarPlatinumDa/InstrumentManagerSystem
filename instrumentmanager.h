@@ -54,6 +54,14 @@ private slots:
     void on_pushButton_2_clicked();
 
     void on_tableView_5_clicked(const QModelIndex &index);
+    
+    void on_cb_department_currentTextChanged(const QString &arg1);
+
+    void on_tableView_6_clicked(const QModelIndex &index);
+
+    void on_pb_agree_clicked();
+
+    void on_pb_reject_clicked();
 
 private:
     Ui::InstrumentManager *ui;
@@ -84,6 +92,20 @@ private:
     int getCanZhi(QString start);
     QStringList findForBaofei();
     void refreshBaofei();
+    QStandardItemModel *modelforapply;//申请的model
+    QStringList *allaplly;//所有申请
+    QStringList *backapply;//设备归还申请
+    QStringList *useableapply;//设备使用申请
+    QStringList *transferapply;//跨部门移交申请
+    QStringList *departname;//获取不重复的已有部门
+    void headapply();//表头
+    void showapply(QStringList *str);//申请表表身
+    QString findequipnamebyid(QString id,QStringList *str);//找到设备名称
+    QString shenhe(int i);//判断审核状态
+    int currrentapplyrow;//现在点击在可显示中的行
+    int currentrowinall;//在所有里中的行数
+    void writefile(QString filename,QStringList *str);//写文件
+    QStringList *allequip;//using+unused
 };
 
 #endif // INSTRUMENTMANAGER_H

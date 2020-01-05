@@ -112,6 +112,19 @@ bool Individual::writeFile(QString path, QString data)
     return true;
 }
 
+bool Individual::writeFile1(QString path, QStringList *data)
+{
+    QFile file(path);
+    if (!file.open(QIODevice::Truncate | QIODevice::Text))
+        return false;
+    QTextStream out(&file);
+   for(int i=0;i<data->length();i++){
+       out<<data->at(i)<<"\n";
+   }
+    file.close();
+    return true;
+}
+
 bool Individual::readFileForInstrument()
 {
     QFile file("baseinformation/instrument-using.txt");
@@ -165,6 +178,18 @@ QString Individual::getDepartmentName(QString id)
     for(int i=0;i<departments.length();i++){
         if(id==departments.at(i).split(" ").at(0)){
             temp=departments.at(i).split(" ").at(1);
+            break;
+        }
+    }
+    return temp;
+}
+
+QString Individual::getUserDepartmentId(QString id)
+{
+    QString temp;
+    for(int i=0;i<users->length();i++){
+        if(id==users->at(i).split(" ").at(0)){
+            temp=users->at(i).split(" ").at(2);
             break;
         }
     }
@@ -671,6 +696,20 @@ void Individual::on_pb_diffrent_clicked()
                     i=i.split(" ").at(0)+" "+i.split(" ").at(1)+" "+i.split(" ").at(2)+" "+i.split(" ").at(3)+" "+
                             i.split(" ").at(4)+" "+i.split(" ").at(5)+" 1";
                     re=QMessageBox::AcceptRole;
+                    QFile file("usinglog/"+instrumentId.split(" ").at(2)+".txt");
+                    if (!file.open(QIODevice::Append | QIODevice::Text))
+                        return;
+                    QTextStream out(&file);
+                    out<<QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm")+" 移交 "+getUserDepartmentId(i.split(" ").at(5))+" "
+                         +i.split(" ").at(5)+" "+i.split(" ").at(1);
+                    file.close();
+                    for(auto&j:*instruments){
+                        if(j.contains(instrumentId.split(" ").at(2))){
+                            j=j.replace(j.split(" ").at(7),i.split(" ").at(5));
+                            break;
+                        }
+                    }
+                    writeFile1("baseinformation/instrument-using.txt",instruments);
                     break;
                 }
             }
@@ -678,8 +717,22 @@ void Individual::on_pb_diffrent_clicked()
             for(auto&i:*messages){
                 if(i.contains(instrumentId)){
                     i=i.split(" ").at(0)+" "+i.split(" ").at(1)+" "+i.split(" ").at(2)+" "+i.split(" ").at(3)+" "+
-                            i.split(" ").at(4)+" "+i.split(" ").at(5)+" "+i.split(" ").at(6)+" 1";
+                            i.split(" ").at(4)+" "+i.split(" ").at(5)+" "+i.split(" ").at(6)+" 1 "+i.split(" ").at(8);
                     re=QMessageBox::AcceptRole;
+                    QFile file("usinglog/"+instrumentId.split(" ").at(2)+".txt");
+                    if (!file.open(QIODevice::Append | QIODevice::Text))
+                        return;
+                    QTextStream out(&file);
+                    out<<QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm")+" 移交 "+getUserDepartmentId(i.split(" ").at(6))+" "
+                         +i.split(" ").at(6)+" "+i.split(" ").at(8);
+                    file.close();
+                    for(auto&j:*instruments){
+                        if(j.contains(instrumentId.split(" ").at(2))){
+                            j=j.replace(j.split(" ").at(7),i.split(" ").at(6));
+                            break;
+                        }
+                    }
+                    writeFile1("baseinformation/instrument-using.txt",instruments);
                     break;
                 }
             }

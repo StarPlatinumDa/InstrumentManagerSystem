@@ -86,6 +86,7 @@ void Logging::on_pb_ok_clicked()
                 if(password==users->at(i).split(" ").at(4)&&this->ui->comboBox->currentIndex()>=users->at(i).split(" ").at(3).toInt()){
                     temp->setUsertype(this->ui->comboBox->currentIndex());
                     temp->setUserid(username);
+                    temp->setInstrumentName(users->at(i).split(" ").at(2));//获取部门编号（+）
                     if(!history->contains(this->ui->cb_username->currentText())){
                         QFile file("loginghistory/history.txt");
                         file.open(QIODevice::Append | QIODevice::Text);

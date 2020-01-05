@@ -16,8 +16,9 @@ public:
     QString getUserid();
     void setUserid(const QString &value);
     static Global* getInstant();
-    void setInstrumentName(const QString &value);
 
+    QString getInstrumentName() const;//增加了两个函数
+    void setInstrumentName(const QString &value);
 };
 
 #endif // GLOBAL_H

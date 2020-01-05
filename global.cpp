@@ -6,6 +6,16 @@ Global::Global()
     usertype=-1;
 }
 
+QString Global::getInstrumentName() const
+{
+    return instrumentName;
+}
+
+void Global::setInstrumentName(const QString &value)
+{
+    instrumentName = value;
+}
+
 Global* Global::global=new Global;
 Global* Global::getInstant()
 {

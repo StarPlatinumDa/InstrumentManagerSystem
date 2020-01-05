@@ -3,6 +3,7 @@
 #include "logging.h"
 #include "global.h"
 #include "individual.h"
+#include "depart.h"
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
@@ -20,7 +21,9 @@ int main(int argc, char *argv[])
             G.show();
             return a.exec();
         }else if(temp->getUsertype()==2){
-
+            depart G;
+            G.show();
+            return a.exec();
         }else{
             Individual G;
             G.show();

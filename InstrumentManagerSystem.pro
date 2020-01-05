@@ -29,8 +29,10 @@ SOURCES += \
     main.cpp \
     modify.cpp \
     userinformation.cpp \
-    usermanager.cpp
-
+    usermanager.cpp \
+    depart.cpp \
+    dialog.cpp \
+    sub1.cpp
 
 HEADERS += \
     addinstrument.h \
@@ -50,7 +52,10 @@ HEADERS += \
     progresspercent.h \
     navprogress.h \
     navbar.h \
-    lunarcalendaritem.h
+    lunarcalendaritem.h \
+    depart.h \
+    dialog.h \
+    sub1.h
 
 FORMS += \
     addinstrument.ui \
@@ -63,7 +68,10 @@ FORMS += \
     logging.ui \
     modify.ui \
     userinformation.ui \
-    usermanager.ui
+    usermanager.ui \
+    depart.ui \
+    dialog.ui \
+    sub1.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -79,3 +87,4 @@ LIBS += -L$$PWD/ -lquc
 
 RESOURCES += \
     source.qrc
+RC_FILE = icon.rc
