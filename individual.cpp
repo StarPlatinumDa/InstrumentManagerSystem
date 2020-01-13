@@ -213,7 +213,11 @@ QStringList *Individual::getMessageData()
             data->append(temp);
         }else{
             QString temp="申请设备";
-            temp+=getInstrumentinformation("baseinformation/instrument-unused.txt",i.split(" ").at(2));
+            QString temp1;
+            temp1=getInstrumentinformation("baseinformation/instrument-unused.txt",i.split(" ").at(2));
+            if(temp1=="")
+                temp1=getInstrumentinformation("baseinformation/instrument-using.txt",i.split(" ").at(2));
+            temp+=temp1;
             temp+=" "+state(i).split(" ").at(0);
             data->append(temp);
         }
